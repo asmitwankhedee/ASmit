@@ -10,6 +10,7 @@ from io import BytesIO
 from pathlib import Path
 
 import streamlit as st
+import streamlit.components.v1 as components
 from ultralytics import YOLO
 from PIL import Image as PILImage
 
@@ -238,120 +239,142 @@ st.markdown(
 )
 
 # ---------------------------------------------------------------------------
-# Dialogflow Chatbot Integration (Floating Widget)
+# Dialogflow Chatbot Integration (Floating Widget Breakout)
 # ---------------------------------------------------------------------------
-st.markdown(
+components.html(
     """
-    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
-    <df-messenger
-      intent="WELCOME"
-      chat-title="RoadAI_Bot"
-      agent-id="d740a8b9-0b41-47fb-b0ca-045645401f82"
-      language-code="en"
-    ></df-messenger>
-    <style>
-      df-messenger {
-        --df-messenger-brand-color: #0f172a !important;
-        --df-messenger-button-titlebar-color: #0f172a !important;
-        --df-messenger-font-color: #ffffff !important;
-        --df-messenger-chat-background-color: #0b0f19 !important;
-        --df-messenger-chat-background: #0b0f19 !important;
-        --df-messenger-send-icon: #10b981 !important;
-        --df-messenger-bot-message: #111827 !important;
-        --df-messenger-agent-message: #111827 !important;
-        --df-messenger-message-bot-font-color: #ffffff !important;
-        --df-messenger-bot-message-font-color: #ffffff !important;
-        --df-messenger-agent-message-font-color: #ffffff !important;
-        --df-messenger-user-message: #4f46e5 !important;
-        --df-messenger-message-user-font-color: #ffffff !important;
-        --df-messenger-user-message-font-color: #ffffff !important;
-        --df-messenger-input-box-color: #1a202c !important;
-        --df-messenger-input-placeholder-font-color: #9ca3af !important;
-        --df-messenger-input-font-color: #ffffff !important;
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        z-index: 1000;
-      }
+    <script>
+        (function() {
+            const parentDoc = window.parent.document;
+            
+            // Check if chatbot is already added to avoid duplicates
+            if (parentDoc.getElementById('df-messenger-marker')) return;
+            
+            const marker = parentDoc.createElement('div');
+            marker.id = 'df-messenger-marker';
+            parentDoc.body.appendChild(marker);
 
-      df-messenger::part(chat-wrapper) {
-        background-color: #0b0f19 !important;
-        border: none !important;
-        border-radius: 16px !important;
-        box-shadow: none !important;
-        backdrop-filter: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-      }
+            // 1. Load Dialogflow Messenger script in parent frame
+            const script = parentDoc.createElement('script');
+            script.src = "https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1";
+            parentDoc.head.appendChild(script);
 
-      df-messenger::part(titlebar) {
-        background-color: #0f172a !important;
-        color: #ffffff !important;
-        border-top-left-radius: 16px !important;
-        border-top-right-radius: 16px !important;
-        border: none !important;
-        box-shadow: none !important;
-      }
+            // 2. Create and configure df-messenger element in parent frame
+            const dfMessenger = parentDoc.createElement('df-messenger');
+            dfMessenger.setAttribute('intent', 'WELCOME');
+            dfMessenger.setAttribute('chat-title', 'RoadAI_Bot');
+            dfMessenger.setAttribute('agent-id', 'd740a8b9-0b41-47fb-b0ca-045645401f82');
+            dfMessenger.setAttribute('language-code', 'en');
 
-      df-messenger::part(message-list) {
-        background-color: #0b0f19 !important;
-        color: #ffffff !important;
-        padding: 0 !important;
-        margin: 0 !important;
-      }
+            // 3. Inject custom styles in parent frame
+            const style = parentDoc.createElement('style');
+            style.textContent = `
+              df-messenger {
+                --df-messenger-brand-color: #0f172a !important;
+                --df-messenger-button-titlebar-color: #0f172a !important;
+                --df-messenger-font-color: #ffffff !important;
+                --df-messenger-chat-background-color: #0b0f19 !important;
+                --df-messenger-chat-background: #0b0f19 !important;
+                --df-messenger-send-icon: #10b981 !important;
+                --df-messenger-bot-message: #111827 !important;
+                --df-messenger-agent-message: #111827 !important;
+                --df-messenger-message-bot-font-color: #ffffff !important;
+                --df-messenger-bot-message-font-color: #ffffff !important;
+                --df-messenger-agent-message-font-color: #ffffff !important;
+                --df-messenger-user-message: #4f46e5 !important;
+                --df-messenger-message-user-font-color: #ffffff !important;
+                --df-messenger-user-message-font-color: #ffffff !important;
+                --df-messenger-input-box-color: #1a202c !important;
+                --df-messenger-input-placeholder-font-color: #9ca3af !important;
+                --df-messenger-input-font-color: #ffffff !important;
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                z-index: 10000;
+              }
 
-      df-messenger::part(bot-message),
-      df-messenger::part(agent-message) {
-        background-color: #111827 !important;
-        color: #ffffff !important;
-        border-radius: 12px !important;
-        border: none !important;
-      }
+              df-messenger::part(chat-wrapper) {
+                background-color: #0b0f19 !important;
+                border: none !important;
+                border-radius: 16px !important;
+                box-shadow: none !important;
+                backdrop-filter: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+              }
 
-      df-messenger::part(user-message) {
-        background-color: #4f46e5 !important;
-        color: #ffffff !important;
-        border-radius: 12px !important;
-        border: none !important;
-      }
+              df-messenger::part(titlebar) {
+                background-color: #0f172a !important;
+                color: #ffffff !important;
+                border-top-left-radius: 16px !important;
+                border-top-right-radius: 16px !important;
+                border: none !important;
+                box-shadow: none !important;
+              }
 
-      df-messenger::part(input-box) {
-        background-color: #1a202c !important;
-        color: #ffffff !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-      }
+              df-messenger::part(message-list) {
+                background-color: #0b0f19 !important;
+                color: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+              }
 
-      df-messenger::part(input) {
-        background-color: transparent !important;
-        color: #ffffff !important;
-        border: none !important;
-        outline: none !important;
-      }
+              df-messenger::part(bot-message),
+              df-messenger::part(agent-message) {
+                background-color: #111827 !important;
+                color: #ffffff !important;
+                border-radius: 12px !important;
+                border: none !important;
+              }
 
-      df-messenger::part(input)::placeholder {
-        color: #9ca3af !important;
-        opacity: 1 !important;
-      }
+              df-messenger::part(user-message) {
+                background-color: #4f46e5 !important;
+                color: #ffffff !important;
+                border-radius: 12px !important;
+                border: none !important;
+              }
 
-      df-messenger::part(scrollbar),
-      df-messenger::part(scrollbar-track) {
-        background-color: #0b0f19 !important;
-      }
+              df-messenger::part(input-box) {
+                background-color: #1a202c !important;
+                color: #ffffff !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+              }
 
-      df-messenger::part(scrollbar-thumb) {
-        background-color: #1a202c !important;
-        border-radius: 999px !important;
-      }
+              df-messenger::part(input) {
+                background-color: transparent !important;
+                color: #ffffff !important;
+                border: none !important;
+                outline: none !important;
+              }
 
-      df-messenger::part(chat-bubble) {
-        background-color: #0f172a !important;
-        color: #ffffff !important;
-      }
-    </style>
+              df-messenger::part(input)::placeholder {
+                color: #9ca3af !important;
+                opacity: 1 !important;
+              }
+
+              df-messenger::part(scrollbar),
+              df-messenger::part(scrollbar-track) {
+                background-color: #0b0f19 !important;
+              }
+
+              df-messenger::part(scrollbar-thumb) {
+                background-color: #1a202c !important;
+                border-radius: 999px !important;
+              }
+
+              df-messenger::part(chat-bubble) {
+                background-color: #0f172a !important;
+                color: #ffffff !important;
+              }
+            `;
+            parentDoc.head.appendChild(style);
+            parentDoc.body.appendChild(dfMessenger);
+        })();
+    </script>
     """,
-    unsafe_allow_html=True,
+    height=0,
 )
 
 
