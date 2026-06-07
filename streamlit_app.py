@@ -238,6 +238,124 @@ st.markdown(
 )
 
 # ---------------------------------------------------------------------------
+# Dialogflow Chatbot Integration (Floating Widget)
+# ---------------------------------------------------------------------------
+st.markdown(
+    """
+    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+    <df-messenger
+      intent="WELCOME"
+      chat-title="RoadAI_Bot"
+      agent-id="d740a8b9-0b41-47fb-b0ca-045645401f82"
+      language-code="en"
+    ></df-messenger>
+    <style>
+      df-messenger {
+        --df-messenger-brand-color: #0f172a !important;
+        --df-messenger-button-titlebar-color: #0f172a !important;
+        --df-messenger-font-color: #ffffff !important;
+        --df-messenger-chat-background-color: #0b0f19 !important;
+        --df-messenger-chat-background: #0b0f19 !important;
+        --df-messenger-send-icon: #10b981 !important;
+        --df-messenger-bot-message: #111827 !important;
+        --df-messenger-agent-message: #111827 !important;
+        --df-messenger-message-bot-font-color: #ffffff !important;
+        --df-messenger-bot-message-font-color: #ffffff !important;
+        --df-messenger-agent-message-font-color: #ffffff !important;
+        --df-messenger-user-message: #4f46e5 !important;
+        --df-messenger-message-user-font-color: #ffffff !important;
+        --df-messenger-user-message-font-color: #ffffff !important;
+        --df-messenger-input-box-color: #1a202c !important;
+        --df-messenger-input-placeholder-font-color: #9ca3af !important;
+        --df-messenger-input-font-color: #ffffff !important;
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 1000;
+      }
+
+      df-messenger::part(chat-wrapper) {
+        background-color: #0b0f19 !important;
+        border: none !important;
+        border-radius: 16px !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      df-messenger::part(titlebar) {
+        background-color: #0f172a !important;
+        color: #ffffff !important;
+        border-top-left-radius: 16px !important;
+        border-top-right-radius: 16px !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      df-messenger::part(message-list) {
+        background-color: #0b0f19 !important;
+        color: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      df-messenger::part(bot-message),
+      df-messenger::part(agent-message) {
+        background-color: #111827 !important;
+        color: #ffffff !important;
+        border-radius: 12px !important;
+        border: none !important;
+      }
+
+      df-messenger::part(user-message) {
+        background-color: #4f46e5 !important;
+        color: #ffffff !important;
+        border-radius: 12px !important;
+        border: none !important;
+      }
+
+      df-messenger::part(input-box) {
+        background-color: #1a202c !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+      }
+
+      df-messenger::part(input) {
+        background-color: transparent !important;
+        color: #ffffff !important;
+        border: none !important;
+        outline: none !important;
+      }
+
+      df-messenger::part(input)::placeholder {
+        color: #9ca3af !important;
+        opacity: 1 !important;
+      }
+
+      df-messenger::part(scrollbar),
+      df-messenger::part(scrollbar-track) {
+        background-color: #0b0f19 !important;
+      }
+
+      df-messenger::part(scrollbar-thumb) {
+        background-color: #1a202c !important;
+        border-radius: 999px !important;
+      }
+
+      df-messenger::part(chat-bubble) {
+        background-color: #0f172a !important;
+        color: #ffffff !important;
+      }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# ---------------------------------------------------------------------------
 # Config & Secrets — reads from st.secrets (Streamlit Cloud) or os.environ (.env)
 # ---------------------------------------------------------------------------
 def get_secret(key: str, default: str = "") -> str:
@@ -594,7 +712,7 @@ def run_prediction(img: PILImage.Image):
     merged_boxes = apply_nms(boxes, iou_threshold=0.40)
 
     horizon = 0.45 * h
-    mpp_bottom = 3.5 / w
+    mpp_bottom = 3.0 / w
     detections = []
     for box in merged_boxes:
         x1, y1, x2, y2, conf, cls_id = box
@@ -706,6 +824,7 @@ if not st.session_state.authenticated:
                     full_name = st.text_input("Full Name", placeholder="Your Full Name", key="input_name")
 
                 email = st.text_input("Email Address", placeholder="you@example.com", key="input_email")
+                password = st.text_input("Password", placeholder="••••••••", type="password", key="input_password")
 
                 if st.button("Send Verification OTP", key="send_otp_btn"):
                     if not email or "@" not in email:
@@ -824,7 +943,7 @@ if st.session_state.result_image is not None:
         st.markdown("### 🔎 Detections")
         st.markdown(
             '<p style="color:#64748b;font-size:.82rem;margin-bottom:1rem;">'
-            'Measurements converted to metres assuming a standard 3.5 m road-width reference.</p>',
+            'Measurements converted to metres assuming a standard 3.0 m road-width reference.</p>',
             unsafe_allow_html=True,
         )
         detections = st.session_state.detections
