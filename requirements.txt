@@ -1,0 +1,12 @@
+numpy<2
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.2.2+cpu
+torchvision==0.17.2+cpu
+opencv-python-headless
+ultralytics
+Pillow
+python-dotenv
+requests
+flask
+gunicorn
+streamlit>=1.35.0
