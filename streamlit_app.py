@@ -12,7 +12,12 @@ from pathlib import Path
 import streamlit as st
 from ultralytics import YOLO
 from PIL import Image as PILImage
-from dotenv import load_dotenv
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # dotenv not needed on Streamlit Cloud
 
 # ---------------------------------------------------------------------------
 # Page Config  (MUST be first Streamlit call)
@@ -233,13 +238,14 @@ st.markdown(
 )
 
 # ---------------------------------------------------------------------------
-# Config & Secrets
+# Config & Secrets — reads from st.secrets (Streamlit Cloud) or os.environ (.env)
 # ---------------------------------------------------------------------------
-load_dotenv()
-
-
 def get_secret(key: str, default: str = "") -> str:
-    return os.environ.get(key, default)
+    """Read a secret from Streamlit Cloud secrets first, then fall back to os.environ."""
+    try:
+        return st.secrets[key]
+    except (KeyError, FileNotFoundError):
+        return os.environ.get(key, default)
 
 
 # ---------------------------------------------------------------------------
